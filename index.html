@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Air Writing System</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#4facfe);
+background-size:400% 400%;
+animation:bg 12s ease infinite;
+}
+
+@keyframes bg{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+.card{
+width:420px;
+padding:35px;
+background:rgba(255,255,255,.15);
+backdrop-filter:blur(15px);
+border-radius:20px;
+box-shadow:0 0 25px rgba(0,0,0,.4);
+text-align:center;
+color:white;
+display:none;
+}
+
+.card.active{
+display:block;
+}
+
+.logo{
+font-size:60px;
+margin-bottom:10px;
+}
+
+input{
+width:100%;
+padding:14px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+font-size:17px;
+cursor:pointer;
+background:#00c853;
+color:white;
+transition:.3s;
+}
+
+button:hover{
+background:#00a844;
+transform:scale(1.03);
+}
+
+a{
+color:white;
+text-decoration:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+.footer{
+margin-top:20px;
+font-size:13px;
+color:#ddd;
+}
+
+.logout{
+background:#e53935;
+}
+
+.logout:hover{
+background:#c62828;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="login" class="card active">
+
+<div class="logo">✍️</div>
+
+<h2>Air Writing Login</h2>
+
+<input id="user" placeholder="Username">
+
+<input id="pass" type="password" placeholder="Password">
+
+<button onclick="login()">
+Login
+</button>
+
+<br><br>
+
+<a onclick="showRegister()">
+Create New Account
+</a>
+
+<div class="footer">
+
+Computer Vision Based Air Writing
+
+</div>
+
+</div>
+
+<!-- REGISTER -->
+
+<div id="register" class="card">
+
+<div class="logo">📝</div>
+
+<h2>Create Account</h2>
+
+<input id="regUser" placeholder="Username">
+
+<input id="regPass" type="password" placeholder="Password">
+
+<button onclick="register()">
+Create Account
+</button>
+
+<br><br>
+
+<a onclick="showLogin()">
+Back To Login
+</a>
+
+</div>
+
+<!-- SUCCESS -->
+
+<div id="success" class="card">
+
+<div class="logo">✅</div>
+
+<h1>Login Successful</h1>
+
+<h3>Welcome to Air Writing</h3>
+
+<br>
+
+<button onclick="startApp()" >🚀 Start Air Writing
+
+</button>
+
+<button class="logout" onclick="showLogin()">
+Logout
+</button>
+
+</div>
+
+<script>
+
+function showLogin(){
+
+document.getElementById("login").classList.add("active");
+document.getElementById("register").classList.remove("active");
+document.getElementById("success").classList.remove("active");
+
+}
+
+function showRegister(){
+
+document.getElementById("login").classList.remove("active");
+document.getElementById("register").classList.add("active");
+document.getElementById("success").classList.remove("active");
+
+}
+
+function register(){
+
+    let username = document.getElementById("regUser").value;
+    let password = document.getElementById("regPass").value;
+
+    fetch("/register",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded"
+        },
+        body:`username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+    })
+
+    .then(response=>response.text())
+
+    .then(data=>{
+
+        console.log(data);
+
+        if(data.trim()=="success"){
+
+            alert("Account Created Successfully");
+
+            showLogin();
+
+        }else{
+
+            alert("Registration Failed");
+
+        }
+
+    })
+
+    .catch(error=>{
+
+        console.log(error);
+
+        alert(error);
+
+    });
+
+}
+
+function login(){
+
+    let username=document.getElementById("user").value;
+    let password=document.getElementById("pass").value;
+
+    fetch("/login",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded"
+        },
+
+        body:`username=${username}&password=${password}`
+
+    })
+
+    .then(response=>response.text())
+
+    .then(data=>{
+
+        if(data=="success"){
+
+            showSuccess();
+
+        }
+        else{
+
+            alert("Invalid Username or Password");
+
+        }
+
+    });
+
+}
+
+function showSuccess(){
+
+document.getElementById("login").classList.remove("active");
+document.getElementById("register").classList.remove("active");
+document.getElementById("success").classList.add("active");
+
+}
+
+function startApp(){
+
+    fetch("/start")
+    .then(response => response.text())
+    .then(data => {
+
+        if(data=="started"){
+
+            alert("Air Writing Started");
+
+        }
+
+    })
+    .catch(error=>{
+        console.log(error);
+        alert("Unable to start Air Writing");
+    });
+
+}
+
+</script>
+
+</body>
+</html>
